@@ -30,33 +30,21 @@ const LoginMessage: React.FC<{
     />
   );
 };
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
-  const {initialState, setInitialState} = useModel('@@initialState');
+
   // const {styles} = useStyles();
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      flushSync(() => {
-        setInitialState((s) => ({
-          ...s,
-          currentUser: userInfo,
-        }));
-      });
-    }
-  };
   const handleSubmit = async (values: API.LoginParams) => {
     try {
-      // 登录
+      // 注册
       const user = await login({
         ...values,
         type,
       });
       if (user) {
-        const defaultLoginSuccessMessage = '登录成功！';
+        const defaultLoginSuccessMessage = '注册成功！';
         message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
         return;
@@ -65,7 +53,7 @@ const Login: React.FC = () => {
       // 如果失败去设置用户错误信息
       setUserLoginState(user);
     } catch (error) {
-      const defaultLoginFailureMessage = '登录失败，请重试！';
+      const defaultLoginFailureMessage = '注册失败，请重试！';
       console.log(error);
       message.error(defaultLoginFailureMessage);
     }
@@ -75,7 +63,7 @@ const Login: React.FC = () => {
     <div>
       <Helmet>
         <title>
-          {'登录'}- {Settings.title}
+          {'注册'}- {Settings.title}
         </title>
       </Helmet>
       <div
@@ -106,7 +94,7 @@ const Login: React.FC = () => {
             items={[
               {
                 key: 'account',
-                label: '账号密码登录',
+                label: '注册账号',
               },
             ]}
           />
@@ -142,32 +130,40 @@ const Login: React.FC = () => {
                     required: true,
                     message: '密码是必填项！',
                   },
+                  {
+                    min: 8,
+                    type: 'string',
+                    message: '长度不能小于8'
+                  }
+                ]}
+              />
+              <ProFormText.Password
+                name="checkPassword"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined/>,
+                }}
+                placeholder={'请再次输出密码'}
+                rules={[
+                  {
+                    required: true,
+                    message: '必须再次输入相同的密码！',
+                  },
+                  {
+                    min: 8,
+                    type: 'string',
+                    message: '长度不能小于8'
+                  }
                 ]}
               />
             </>
           )}
 
           {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误"/>}
-          <div
-            style={{
-              marginBottom: 24,
-            }}
-          >
-            <ProFormCheckbox noStyle name="autoLogin">
-              自动登录
-            </ProFormCheckbox>
-            <a
-              style={{
-                float: 'right',
-              }}
-            >
-              忘记密码 ?
-            </a>
-          </div>
         </LoginForm>
       </div>
       <Footer/>
     </div>
   );
 };
-export default Login;
+export default Register;

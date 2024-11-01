@@ -27,7 +27,7 @@ export async function getInitialState(): Promise<{
       });
       return msg.data;
     } catch (error) {
-      history.push(loginPath);
+      //history.push(loginPath);
     }
     return undefined;
   };
@@ -48,7 +48,10 @@ export async function getInitialState(): Promise<{
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
-export const layout: RunTimeLayoutConfig = ({initialState, setInitialState}) => {
+export const layout: ({initialState, setInitialState}: {
+  initialState: any;
+  setInitialState: any
+}) => any = ({initialState, setInitialState}) => {
   return {
     actionsRender: () => [<Question key="doc"/>],
     avatarProps: {
@@ -64,8 +67,12 @@ export const layout: RunTimeLayoutConfig = ({initialState, setInitialState}) => 
     footerRender: () => <Footer/>,
     onPageChange: () => {
       const {location} = history;
-      // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
+      const whiteList = ['/user/register', loginPath];
+      if (whiteList.includes(location.pathname)) {
+        return;
+      }
+
+      if (!initialState?.currentUser) {
         history.push(loginPath);
       }
     },

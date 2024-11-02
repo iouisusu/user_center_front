@@ -1,64 +1,52 @@
 import {Footer} from '@/components';
-import {login} from '@/services/ant-design-pro/api';
+import {register} from '@/services/ant-design-pro/api';
 import {
   LockOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import {
   LoginForm,
-  ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
-import {Helmet, history, useModel} from '@umijs/max';
-import {Alert, message, Tabs} from 'antd';
+import {Helmet, history} from '@umijs/max';
+import {message, Tabs} from 'antd';
 import React, {useState} from 'react';
-import {flushSync} from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 import {SYSTEM_LOGO} from "@/constants";
 
-const LoginMessage: React.FC<{
-  content: string;
-}> = ({content}) => {
-  return (
-    <Alert
-      style={{
-        marginBottom: 24,
-      }}
-      message={content}
-      type="error"
-      showIcon
-    />
-  );
-};
 const Register: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
 
   // const {styles} = useStyles();
-  const handleSubmit = async (values: API.LoginParams) => {
+  const handleSubmit = async (values: API.RegisterParams) => {
+    const {userPassword, checkPassword} = values;
+    if (userPassword !== checkPassword) {
+      message.error("两次输入的密码不一致");
+      return;
+    }
+
     try {
       // 注册
-      const user = await login({
-        ...values,
-        type,
-      });
-      if (user) {
-        const defaultLoginSuccessMessage = '注册成功！';
+      const id = await register(values);
+
+      console.log(`id=${id}`);
+      if (id > 0) {
+        const defaultLoginSuccessMessage = `注册成功！`;
         message.success(defaultLoginSuccessMessage);
-        const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/');
+
+        if (!history) return;
+        const {query} = history.location;
+        history.push({
+          pathname: '/user/login',
+          query,
+        });
         return;
       }
-      console.log(user);
-      // 如果失败去设置用户错误信息
-      setUserLoginState(user);
     } catch (error) {
       const defaultLoginFailureMessage = '注册失败，请重试！';
-      console.log(error);
       message.error(defaultLoginFailureMessage);
     }
   };
-  const {status, type: loginType} = userLoginState;
   return (
     <div>
       <Helmet>
@@ -73,6 +61,11 @@ const Register: React.FC = () => {
         }}
       >
         <LoginForm
+          submitter={{
+            searchConfig: {
+              submitText: '注册'
+            }
+          }}
           contentStyle={{
             minWidth: 280,
             maxWidth: '75vw',
@@ -99,9 +92,6 @@ const Register: React.FC = () => {
             ]}
           />
 
-          {status === 'error' && loginType === 'account' && (
-            <LoginMessage content={'错误的账号和密码'}/>
-          )}
           {type === 'account' && (
             <>
               <ProFormText
@@ -159,7 +149,6 @@ const Register: React.FC = () => {
             </>
           )}
 
-          {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误"/>}
         </LoginForm>
       </div>
       <Footer/>

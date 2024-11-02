@@ -9,12 +9,12 @@ import {
   ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
-import {Helmet, history, useModel} from '@umijs/max';
-import {Alert, message, Tabs} from 'antd';
+import {Helmet, history, Link, useModel} from '@umijs/max';
+import {Alert, Divider, message, Space, Tabs} from 'antd';
 import React, {useState} from 'react';
 import {flushSync} from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
-import {SYSTEM_LOGO} from "@/constants";
+import {PLANET_LINK, SYSTEM_LOGO} from "@/constants";
 
 const LoginMessage: React.FC<{
   content: string;
@@ -47,12 +47,10 @@ const Login: React.FC = () => {
     }
   };
   const handleSubmit = async (values: API.LoginParams) => {
+
     try {
       // 登录
-      const user = await login({
-        ...values,
-        type,
-      });
+      const user = await login(values);
       if (user) {
         const defaultLoginSuccessMessage = '登录成功！';
         message.success(defaultLoginSuccessMessage);
@@ -146,23 +144,27 @@ const Login: React.FC = () => {
               />
             </>
           )}
-
-          {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误"/>}
           <div
             style={{
               marginBottom: 24,
             }}
           >
-            <ProFormCheckbox noStyle name="autoLogin">
-              自动登录
-            </ProFormCheckbox>
-            <a
-              style={{
-                float: 'right',
-              }}
-            >
-              忘记密码 ?
-            </a>
+            <Space split={<Divider type="vertical"/>}>
+              <ProFormCheckbox noStyle name="autoLogin">
+                自动登录
+              </ProFormCheckbox>
+              <Link to="/user/register">新用户注册</Link>
+              <a
+                style={{
+                  float: 'right',
+                }}
+                href={PLANET_LINK}
+                target="_blank"
+                rel="noreferrer"
+              >
+                忘记密码
+              </a>
+            </Space>
           </div>
         </LoginForm>
       </div>

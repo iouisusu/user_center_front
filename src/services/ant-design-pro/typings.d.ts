@@ -29,6 +29,8 @@ declare namespace API {
     currentAuthority?: string;
   };
 
+  type RegisterResult = number;
+
   type PageParams = {
     current?: number;
     pageSize?: number;
@@ -64,7 +66,14 @@ declare namespace API {
   type LoginParams = {
     userAccount?: string;
     userPassword?: string;
-    // autoLogin?: boolean;
+    autoLogin?: boolean;
+    type?: string;
+  };
+
+  type RegisterParams = {
+    userAccount?: string;
+    userPassword?: string;
+    checkPassword?: string;
     // type?: string;
   };
 

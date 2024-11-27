@@ -46,6 +46,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
+    //调用框架接口，向后端发送请求
     await outLogin();
     const {search, pathname} = window.location;
     const urlParams = new URL(window.location.href).searchParams;
@@ -70,6 +71,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
       const {key} = event;
       if (key === 'logout') {
         flushSync(() => {
+          //前端注销
           setInitialState((s) => ({...s, currentUser: undefined}));
         });
         loginOut();
@@ -110,7 +112,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
           icon: <UserOutlined/>,
           label: '个人中心',
         },
-        {
+         {
           key: 'settings',
           icon: <SettingOutlined/>,
           label: '个人设置',
@@ -126,7 +128,12 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
       label: '退出登录',
     },
   ];
-
+  /**
+   * 对于一个下拉菜单绑定上一个事件，点击时触发一系列事件
+   * 前段：把当前用户设置为未定义
+   * 后端：调用logout方法，分为两步：调用框架的api.ts定义的向后端发送post请求的方法，后端清除session.
+   * 检验是否成功：退出登录，回到登录页，地址栏键入8000，不会进入，之前会进入，现在还是停留在登录页。
+   */
   return (
     <HeaderDropdown
       menu={{

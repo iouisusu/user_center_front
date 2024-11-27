@@ -27,9 +27,9 @@ const Register: React.FC = () => {
 
     try {
       // 注册
+      //点击注册后请求后端
       const id = await register(values);
-
-      console.log(`id=${id}`);
+      //点击注册后前端的行为
       if (id > 0) {
         const defaultLoginSuccessMessage = `注册成功！`;
         message.success(defaultLoginSuccessMessage);
@@ -144,6 +144,22 @@ const Register: React.FC = () => {
                     type: 'string',
                     message: '长度不能小于8'
                   }
+                ]}
+              />
+              <ProFormText
+                name="planetCode"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined/>,
+                }}
+                placeholder={'请输入星球编号'}
+                //rules是校验规则
+                rules={[
+                  {
+                    //框架自动校验是否必填
+                    required: true,
+                    message: '星球编号是必填项！',
+                  },
                 ]}
               />
             </>
